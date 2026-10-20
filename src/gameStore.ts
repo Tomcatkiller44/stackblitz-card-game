@@ -1,6 +1,7 @@
-import { writable, derived } from 'svelte/store';
+import { writable, derived, get } from 'svelte/store';
 import type { CardInstance, GamePhase, FloatingNumber } from './types';
 import { CARDS, ENEMY, STARTER_DECK, PLAYER_MAX_HP, PLAYER_MAX_ENERGY, HAND_SIZE } from './gameData';
+import { persistentWritable } from './persistentStore';
 
 let uidCounter = 0;
 const nextUid = () => `c${++uidCounter}`;
@@ -61,6 +62,34 @@ export interface GameState {
   log: string[];
 }
 
+function isGamePhase(value: unknown): value is GamePhase {
+  return value === 'player' || value === 'enemy' || value === 'won' || value === 'lost';
+}
+
+function isCardInstance(value: unknown): value is CardInstance {
+  if (!value || typeof value !== 'object') return false;
+  const card = value as Partial<CardInstance>;
+  return typeof card.uid === 'string' && CARDS.some((definition) => definition.id === card.id);
+}
+
+function isGameState(value: unknown): value is GameState {
+  if (!value || typeof value !== 'object') return false;
+  const state = value as Partial<GameState>;
+  const numericFields: (keyof GameState)[] = [
+    'playerHP', 'playerBlock', 'energy', 'enemyHP', 'enemyBlock',
+    'enemyVulnerable', 'intentIndex', 'turn',
+  ];
+
+  return (
+    Array.isArray(state.deck) && state.deck.every(isCardInstance) &&
+    Array.isArray(state.hand) && state.hand.every(isCardInstance) &&
+    Array.isArray(state.discard) && state.discard.every(isCardInstance) &&
+    numericFields.every((field) => typeof state[field] === 'number' && Number.isFinite(state[field])) &&
+    isGamePhase(state.phase) &&
+    Array.isArray(state.log) && state.log.every((entry) => typeof entry === 'string')
+  );
+}
+
 function createInitialState(): GameState {
   const full = shuffle(buildDeck());
   const { hand, deck, discard } = drawCards(full, [], HAND_SIZE);
@@ -79,10 +108,16 @@ function createInitialState(): GameState {
   };
 }
 
-export const game = writable<GameState>(createInitialState());
+export const game = persistentWritable<GameState>(
+  'spire-clash:game:v1',
+  createInitialState(),
+  isGameState
+);
 export const floats = writable<FloatingNumber[]>([]);
 
 export const enemyIntent = derived(game, ($g) => ENEMY.intents[$g.intentIndex % ENEMY.intents.length]);
+
+let pendingEnemyTurn: ReturnType<typeof setTimeout> | undefined;
 
 export function addFloat(target: 'player' | 'enemy', text: string, kind: 'damage' | 'block' | 'heal') {
   const id = ++floatId;
@@ -161,18 +196,22 @@ export function playCard(uid: string) {
 }
 
 export function endTurn() {
-  let snapshot: GameState;
+  if (get(game).phase !== 'player') return;
+
   game.update((prev) => {
-    snapshot = prev;
     const newDiscard = [...prev.discard, ...prev.hand];
     return { ...prev, hand: [], discard: newDiscard, phase: 'enemy', log: ['--- Enemy Turn ---', ...prev.log].slice(0, 6) };
   });
+}
 
-  const intent = ENEMY.intents[snapshot!.intentIndex % ENEMY.intents.length];
+function scheduleEnemyTurn(intentIndex: number) {
+  if (pendingEnemyTurn !== undefined) clearTimeout(pendingEnemyTurn);
 
-  setTimeout(() => {
+  const intent = ENEMY.intents[intentIndex % ENEMY.intents.length];
+  pendingEnemyTurn = setTimeout(() => {
+    pendingEnemyTurn = undefined;
     game.update((prev) => {
-      if (prev.phase === 'lost' || prev.phase === 'won') return prev;
+      if (prev.phase !== 'enemy' || prev.intentIndex !== intentIndex) return prev;
 
       let playerHP = prev.playerHP;
       let playerBlock = prev.playerBlock;
@@ -197,7 +236,7 @@ export function endTurn() {
         addFloat('enemy', `+${intent.value}`, 'block');
       }
 
-      const intentIndex = prev.intentIndex + 1;
+      const nextIntentIndex = prev.intentIndex + 1;
       let phase: GamePhase = 'player';
       if (playerHP <= 0) {
         phase = 'lost';
@@ -224,12 +263,27 @@ export function endTurn() {
         log.unshift(`--- Turn ${turn} ---`);
       }
 
-      return { ...prev, deck, hand, discard, playerHP, playerBlock, enemyBlock, enemyVulnerable, energy, intentIndex, phase, turn, log: log.slice(0, 6) };
+      return { ...prev, deck, hand, discard, playerHP, playerBlock, enemyBlock, enemyVulnerable, energy, intentIndex: nextIntentIndex, phase, turn, log: log.slice(0, 6) };
     });
   }, 900);
 }
 
 export function restart() {
+  if (pendingEnemyTurn !== undefined) {
+    clearTimeout(pendingEnemyTurn);
+    pendingEnemyTurn = undefined;
+  }
   game.set(createInitialState());
   floats.set([]);
 }
+
+let previousPhase: GamePhase | undefined;
+game.subscribe((state) => {
+  if (state.phase === 'enemy' && previousPhase !== 'enemy') {
+    scheduleEnemyTurn(state.intentIndex);
+  } else if (state.phase !== 'enemy' && pendingEnemyTurn !== undefined) {
+    clearTimeout(pendingEnemyTurn);
+    pendingEnemyTurn = undefined;
+  }
+  previousPhase = state.phase;
+});
