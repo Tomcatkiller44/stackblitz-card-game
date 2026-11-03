@@ -10,6 +10,7 @@ export const CARDS: CardDef[] = [
     description: 'Deal 6 damage.',
     damage: 6,
     impact: 'slash',
+    art: 'sword',
   },
   {
     id: 'defend',
@@ -19,6 +20,8 @@ export const CARDS: CardDef[] = [
     rarity: 'common',
     description: 'Gain 5 Block.',
     block: 5,
+    impact: 'shield',
+    art: 'shield',
   },
   {
     id: 'bash',
@@ -30,6 +33,7 @@ export const CARDS: CardDef[] = [
     damage: 8,
     vulnerable: 2,
     impact: 'slash',
+    art: 'sword',
   },
   {
     id: 'cleave',
@@ -40,6 +44,7 @@ export const CARDS: CardDef[] = [
     description: 'Deal 9 damage.',
     damage: 9,
     impact: 'x-slash',
+    art: 'sword-reinforced',
   },
   {
     id: 'pommel',
@@ -51,6 +56,7 @@ export const CARDS: CardDef[] = [
     damage: 7,
     drawCards: 1,
     impact: 'bonk',
+    art: 'sword-reversed',
   },
   {
     id: 'bulwark',
@@ -60,6 +66,8 @@ export const CARDS: CardDef[] = [
     rarity: 'uncommon',
     description: 'Gain 12 Block.',
     block: 12,
+    impact: 'shield-reinforced',
+    art: 'shield-reinforced',
   },
   {
     id: 'thornmail',
@@ -70,6 +78,8 @@ export const CARDS: CardDef[] = [
     description: 'Gain 4 Block.\nWhen attacked, deal 2 damage back.',
     block: 4,
     thorns: 2,
+    impact: 'shield-spiky',
+    art: 'shield-spiky',
   },
 ];
 

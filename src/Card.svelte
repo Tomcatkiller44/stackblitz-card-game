@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Sword, Shield } from 'lucide-svelte';
   import type { CardInstance } from './types';
+  import CardArt from './CardArt.svelte';
 
   export let card: CardInstance;
   export let playable: boolean;
@@ -69,11 +70,7 @@
 
     <!-- Art area -->
     <div class="absolute top-0 left-0 right-0 h-24 flex items-center justify-center">
-      {#if card.type === 'attack'}
-        <Sword size={48} class="text-red-500/30" />
-      {:else}
-        <Shield size={48} class="text-sky-500/30" />
-      {/if}
+      <CardArt art={card.art} className="w-20 h-20 drop-shadow-lg" />
     </div>
 
     <!-- Divider -->

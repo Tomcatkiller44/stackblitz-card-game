@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { ImpactStyle } from './types';
+  import CardArt from './CardArt.svelte';
 
   export let style: ImpactStyle;
 
@@ -14,23 +15,31 @@
   });
 </script>
 
-<svg viewBox="0 0 100 100" class="absolute inset-0 w-full h-full pointer-events-none overflow-visible" aria-hidden="true">
-  {#if style === 'slash'}
-    <line class="glow slash" pathLength="1" x1="16" y1="14" x2="86" y2="88" />
-    <line class="streak slash" pathLength="1" x1="16" y1="14" x2="86" y2="88" />
-  {:else if style === 'x-slash'}
-    <line class="glow slash" pathLength="1" x1="16" y1="14" x2="86" y2="88" />
-    <line class="streak slash" pathLength="1" x1="16" y1="14" x2="86" y2="88" />
-    <line class="glow slash late" pathLength="1" x1="86" y1="14" x2="16" y2="88" />
-    <line class="streak slash late" pathLength="1" x1="86" y1="14" x2="16" y2="88" />
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+  {#if style === 'slash' || style === 'x-slash' || style === 'bonk'}
+    <svg viewBox="0 0 100 100" class="w-full h-full overflow-visible" aria-hidden="true">
+      {#if style === 'slash'}
+        <line class="glow slash" pathLength="1" x1="16" y1="14" x2="86" y2="88" />
+        <line class="streak slash" pathLength="1" x1="16" y1="14" x2="86" y2="88" />
+      {:else if style === 'x-slash'}
+        <line class="glow slash" pathLength="1" x1="16" y1="14" x2="86" y2="88" />
+        <line class="streak slash" pathLength="1" x1="16" y1="14" x2="86" y2="88" />
+        <line class="glow slash late" pathLength="1" x1="86" y1="14" x2="16" y2="88" />
+        <line class="streak slash late" pathLength="1" x1="86" y1="14" x2="16" y2="88" />
+      {:else}
+        <circle class="ring" cx="50" cy="50" r="20" />
+        <circle class="flash" cx="50" cy="50" r="12" />
+        {#each rays as ray}
+          <line class="ray" x1={ray.x1} y1={ray.y1} x2={ray.x2} y2={ray.y2} />
+        {/each}
+      {/if}
+    </svg>
   {:else}
-    <circle class="ring" cx="50" cy="50" r="20" />
-    <circle class="flash" cx="50" cy="50" r="12" />
-    {#each rays as ray}
-      <line class="ray" x1={ray.x1} y1={ray.y1} x2={ray.x2} y2={ray.y2} />
-    {/each}
+    <div class="shield-pop">
+      <CardArt art={style} className="w-24 h-24 drop-shadow-xl" />
+    </div>
   {/if}
-</svg>
+</div>
 
 <style>
   .slash {
@@ -81,6 +90,10 @@
     animation: ray-burst 0.45s ease-out forwards;
   }
 
+  .shield-pop {
+    animation: shield-pop 0.7s ease-out forwards;
+  }
+
   @keyframes slash-draw {
     from { stroke-dashoffset: 1; }
     to { stroke-dashoffset: 0; }
@@ -103,5 +116,12 @@
   @keyframes ray-burst {
     from { transform: scale(0.4); opacity: 1; }
     to { transform: scale(1.1); opacity: 0; }
+  }
+
+  @keyframes shield-pop {
+    0% { transform: scale(0.4); opacity: 0; }
+    35% { transform: scale(1.08); opacity: 1; }
+    75% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1); opacity: 0; }
   }
 </style>

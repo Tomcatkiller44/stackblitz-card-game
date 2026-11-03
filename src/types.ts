@@ -14,7 +14,8 @@ export interface CardDef {
   drawCards?: number;
   heal?: number;
   thorns?: number;
-  impact?: ImpactStyle;
+  impact: ImpactStyle;
+  art: CardArtKind;
 }
 
 export interface CardInstance extends CardDef {
@@ -37,11 +38,14 @@ export interface EnemyIntent {
 export type GamePhase = 'player' | 'enemy' | 'cleared' | 'won' | 'lost';
 export type GameScreen = 'start' | 'battle';
 
-export type ImpactStyle = 'slash' | 'x-slash' | 'bonk';
+export type ShieldStyle = 'shield' | 'shield-reinforced' | 'shield-spiky';
+export type ImpactStyle = 'slash' | 'x-slash' | 'bonk' | ShieldStyle;
+export type CardArtKind = 'sword' | 'sword-reinforced' | 'sword-reversed' | ShieldStyle;
 
 export interface ImpactEffect {
   id: number;
   style: ImpactStyle;
+  target: 'player' | 'enemy';
 }
 
 export interface FloatingNumber {

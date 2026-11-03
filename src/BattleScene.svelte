@@ -16,6 +16,8 @@
   $: nextEnemy = ENEMIES[state.enemyIndex + 1];
   $: enemyFloats = $floats.filter((f) => f.target === 'enemy');
   $: playerFloats = $floats.filter((f) => f.target === 'player');
+  $: enemyImpacts = $impactEffects.filter((e) => e.target === 'enemy');
+  $: playerImpacts = $impactEffects.filter((e) => e.target === 'player');
 
   function floatColor(kind: string): string {
     if (kind === 'damage') return 'text-red-400';
@@ -86,7 +88,7 @@
             </div>
           {/if}
 
-          {#each $impactEffects as effect (effect.id)}
+          {#each enemyImpacts as effect (effect.id)}
             <AttackImpact style={effect.style} />
           {/each}
 
@@ -139,6 +141,10 @@
             <span class="text-[10px] font-bold text-rose-300">{state.playerThorns}</span>
           </div>
         {/if}
+
+        {#each playerImpacts as effect (effect.id)}
+          <AttackImpact style={effect.style} />
+        {/each}
 
         {#each playerFloats as f (f.id)}
           <div class="absolute top-4 left-1/2 -translate-x-1/2 text-2xl font-bold animate-float-up {floatColor(f.kind)}">

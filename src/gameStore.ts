@@ -134,9 +134,9 @@ let pendingEnemyTurn: ReturnType<typeof setTimeout> | undefined;
 
 let impactId = 0;
 
-function showImpact(style: ImpactStyle) {
+function showImpact(style: ImpactStyle, target: 'player' | 'enemy') {
   const id = ++impactId;
-  impactEffects.update((prev) => [...prev, { id, style }]);
+  impactEffects.update((prev) => [...prev, { id, style, target }]);
   setTimeout(() => {
     impactEffects.update((prev) => prev.filter((e) => e.id !== id));
   }, 700);
@@ -172,8 +172,9 @@ export function playCard(uid: string) {
     const enemy = ENEMIES[prev.enemyIndex];
     const log = [...prev.log];
 
+    showImpact(card.impact, card.damage ? 'enemy' : 'player');
+
     if (card.damage) {
-      if (card.impact) showImpact(card.impact);
       let dmg = card.damage;
       if (enemyVulnerable > 0) dmg = Math.floor(dmg * 1.5);
       const absorbed = Math.min(enemyBlock, dmg);
