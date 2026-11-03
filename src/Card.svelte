@@ -2,6 +2,7 @@
   import { Sword, Shield } from 'lucide-svelte';
   import type { CardInstance } from './types';
   import ShieldArt from './ShieldArt.svelte';
+  import WeaponArt from './WeaponArt.svelte';
 
   export let card: CardInstance;
   export let playable: boolean;
@@ -70,10 +71,10 @@
 
     <!-- Art area -->
     <div class="absolute top-0 left-0 right-0 h-24 flex items-center justify-center">
-      {#if card.art}
+      {#if card.weapon}
+        <WeaponArt weapon={card.weapon} className="w-16 h-16 drop-shadow-lg" />
+      {:else if card.art}
         <ShieldArt art={card.art} className="w-16 h-16 drop-shadow-lg" />
-      {:else}
-        <Sword size={48} class="text-red-500/30" />
       {/if}
     </div>
 

@@ -16,6 +16,7 @@ export interface CardDef {
   thorns?: number;
   impact: ImpactStyle;
   art?: ShieldStyle;
+  weapon?: WeaponStyle;
 }
 
 export interface CardInstance extends CardDef {
@@ -39,6 +40,7 @@ export type GamePhase = 'player' | 'enemy' | 'cleared' | 'won' | 'lost';
 export type GameScreen = 'start' | 'battle';
 
 export type ShieldStyle = 'shield' | 'shield-reinforced' | 'shield-spiky';
+export type WeaponStyle = 'longsword' | 'warhammer' | 'twin-axes' | 'pommel-strike';
 export type ImpactStyle = 'slash' | 'x-slash' | 'bonk' | ShieldStyle;
 
 export interface ImpactEffect {

@@ -10,6 +10,7 @@ export const CARDS: CardDef[] = [
     description: 'Deal 6 damage.',
     damage: 6,
     impact: 'slash',
+    weapon: 'longsword',
   },
   {
     id: 'defend',
@@ -32,6 +33,7 @@ export const CARDS: CardDef[] = [
     damage: 8,
     vulnerable: 2,
     impact: 'slash',
+    weapon: 'warhammer',
   },
   {
     id: 'cleave',
@@ -42,6 +44,7 @@ export const CARDS: CardDef[] = [
     description: 'Deal 9 damage.',
     damage: 9,
     impact: 'x-slash',
+    weapon: 'twin-axes',
   },
   {
     id: 'pommel',
@@ -53,6 +56,7 @@ export const CARDS: CardDef[] = [
     damage: 7,
     drawCards: 1,
     impact: 'bonk',
+    weapon: 'pommel-strike',
   },
   {
     id: 'bulwark',
