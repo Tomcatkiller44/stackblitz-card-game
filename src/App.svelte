@@ -14,5 +14,5 @@
 {#if $screen === 'start'}
   <StartScreen onStart={() => screen.set('battle')} />
 {:else}
-  <BattleScene />
+  <BattleScene onExit={() => screen.set('start')} />
 {/if}

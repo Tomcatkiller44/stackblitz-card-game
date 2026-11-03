@@ -8,6 +8,8 @@
   import AttackImpact from './AttackImpact.svelte';
   import BattleResultOverlay from './BattleResultOverlay.svelte';
 
+  export let onExit: () => void;
+
   $: state = $game;
   $: intent = $enemyIntent;
   $: enemy = ENEMIES[state.enemyIndex];
@@ -29,7 +31,17 @@
       <Swords size={22} class="text-amber-400" />
       <span class="text-lg font-bold tracking-wide">Spire Clash</span>
     </div>
-    <div class="text-sm text-slate-400">Foe {state.enemyIndex + 1} of {ENEMIES.length} &middot; Turn {state.turn}</div>
+    <div class="flex items-center gap-4">
+      <div class="text-sm text-slate-400">Foe {state.enemyIndex + 1} of {ENEMIES.length} &middot; Turn {state.turn}</div>
+      <button
+        on:click={() => { restart(); onExit(); }}
+        class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg transition-colors"
+        aria-label="Reset run and return to main menu"
+      >
+        <RotateCcw size={14} />
+        Reset
+      </button>
+    </div>
   </div>
 
   <!-- Battle area -->
