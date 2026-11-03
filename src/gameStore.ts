@@ -118,7 +118,7 @@ function createInitialState(): GameState {
 }
 
 export const game = persistentWritable<GameState>(
-  'spire-clash:game:v1',
+  'spire-clash:game:v2',
   createInitialState(),
   isGameState
 );
