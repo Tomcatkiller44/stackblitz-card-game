@@ -81,6 +81,18 @@ export const CARDS: CardDef[] = [
     impact: 'shield-spiky',
     art: 'shield-spiky',
   },
+  {
+    id: 'banishing-strike',
+    name: 'Banishing Strike',
+    cost: 2,
+    type: 'attack',
+    rarity: 'rare',
+    description: 'Deal 35 damage.\nIf it defeats the foe, return it to your hand next turn.',
+    damage: 35,
+    impact: 'slash',
+    weapon: 'master-sword',
+    returnsOnKill: true,
+  },
 ];
 
 export const STARTER_DECK: string[] = [
@@ -150,3 +162,4 @@ export const PLAYER_MAX_HP = 72;
 export const PLAYER_MAX_ENERGY = 3;
 export const HAND_SIZE = 5;
 export const RECOVERY_BETWEEN_FOES = 20;
+export const BANISHING_SPAWN_CHANCE = 0.1;

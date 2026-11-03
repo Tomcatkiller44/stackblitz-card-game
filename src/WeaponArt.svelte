@@ -14,6 +14,17 @@
       <rect x="46" y="66" width="8" height="20" rx="2" fill="#7c2d12" />
       <circle cx="50" cy="91" r="5.5" fill="#fbbf24" stroke="#b45309" stroke-width="1.5" />
     </g>
+  {:else if weapon === 'master-sword'}
+    <circle cx="50" cy="50" r="42" fill="#38bdf8" opacity="0.18" />
+    <g transform="rotate(45 50 50)">
+      <path d="M50 3 L57 16 L57 60 L43 60 L43 16 Z" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="1.5" stroke-linejoin="round" />
+      <rect x="48.5" y="14" width="3" height="44" fill="#38bdf8" />
+      <path d="M22 58 Q50 66 78 58 L74 66 Q50 72 26 66 Z" fill="#fbbf24" stroke="#b45309" stroke-width="1.5" stroke-linejoin="round" />
+      <circle cx="50" cy="62" r="3" fill="#38bdf8" />
+      <rect x="46" y="70" width="8" height="18" rx="2" fill="#1e40af" />
+      <circle cx="50" cy="92" r="5.5" fill="#fbbf24" stroke="#b45309" stroke-width="1.5" />
+      <circle cx="50" cy="92" r="2.5" fill="#38bdf8" />
+    </g>
   {:else if weapon === 'warhammer'}
     <rect x="45" y="34" width="10" height="58" rx="4" fill="#92400e" />
     <rect x="22" y="12" width="56" height="28" rx="4" fill="#64748b" stroke="#cbd5e1" stroke-width="2" />

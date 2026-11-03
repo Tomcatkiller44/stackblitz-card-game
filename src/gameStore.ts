@@ -1,6 +1,6 @@
 import { writable, derived, get } from 'svelte/store';
 import type { CardInstance, GamePhase, FloatingNumber, ImpactEffect, ImpactStyle } from './types';
-import { CARDS, ENEMIES, STARTER_DECK, PLAYER_MAX_HP, PLAYER_MAX_ENERGY, HAND_SIZE, RECOVERY_BETWEEN_FOES } from './gameData';
+import { CARDS, ENEMIES, STARTER_DECK, PLAYER_MAX_HP, PLAYER_MAX_ENERGY, HAND_SIZE, RECOVERY_BETWEEN_FOES, BANISHING_SPAWN_CHANCE } from './gameData';
 import { persistentWritable } from './persistentStore';
 
 let uidCounter = 0;
@@ -8,11 +8,13 @@ const nextUid = () => `c${++uidCounter}`;
 
 let floatId = 0;
 
+function createCardInstance(id: string): CardInstance {
+  const def = CARDS.find((c) => c.id === id)!;
+  return { ...def, uid: nextUid() };
+}
+
 function buildDeck(): CardInstance[] {
-  return STARTER_DECK.map((id) => {
-    const def = CARDS.find((c) => c.id === id)!;
-    return { ...def, uid: nextUid() };
-  });
+  return STARTER_DECK.map(createCardInstance);
 }
 
 function shuffle<T>(arr: T[]): T[] {
@@ -224,6 +226,10 @@ export function playCard(uid: string) {
       const isFinalFoe = prev.enemyIndex === ENEMIES.length - 1;
       phase = isFinalFoe ? 'won' : 'cleared';
       log.unshift(`${enemy.name} is defeated!`);
+      if (card.returnsOnKill) {
+        discard = discard.filter((c) => c.uid !== card.uid);
+        deck = [card, ...deck];
+      }
     }
 
     return { ...prev, deck, hand, discard, playerHP, playerBlock, playerThorns, enemyHP, enemyBlock, enemyVulnerable, damageDealt, energy: newEnergy, phase, log: log.slice(0, 6) };
@@ -236,9 +242,12 @@ export function advanceToNextFoe() {
 
     const nextIndex = prev.enemyIndex + 1;
     const next = ENEMIES[nextIndex];
-    const recycled = [...prev.discard, ...prev.hand];
+    const spawned = Math.random() < BANISHING_SPAWN_CHANCE ? [createCardInstance('banishing-strike')] : [];
+    const recycled = [...prev.discard, ...prev.hand, ...spawned];
     const { hand, deck, discard } = drawCards(prev.deck, recycled, HAND_SIZE);
     const playerHP = Math.min(PLAYER_MAX_HP, prev.playerHP + RECOVERY_BETWEEN_FOES);
+    const header = `--- Turn ${prev.turn + 1}: ${next.name} appears! ---`;
+    const found = spawned.length > 0 ? ['A Banishing Strike joins your deck!'] : [];
 
     return {
       ...prev,
@@ -256,7 +265,7 @@ export function advanceToNextFoe() {
       intentIndex: 0,
       phase: 'player',
       turn: prev.turn + 1,
-      log: [`--- Turn ${prev.turn + 1}: ${next.name} appears! ---`, ...prev.log].slice(0, 6),
+      log: [header, ...found, ...prev.log].slice(0, 6),
     };
   });
 }

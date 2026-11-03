@@ -17,6 +17,7 @@ export interface CardDef {
   impact: ImpactStyle;
   art?: ShieldStyle;
   weapon?: WeaponStyle;
+  returnsOnKill?: boolean;
 }
 
 export interface CardInstance extends CardDef {
@@ -40,7 +41,7 @@ export type GamePhase = 'player' | 'enemy' | 'cleared' | 'won' | 'lost';
 export type GameScreen = 'start' | 'battle';
 
 export type ShieldStyle = 'shield' | 'shield-reinforced' | 'shield-spiky';
-export type WeaponStyle = 'longsword' | 'warhammer' | 'twin-axes' | 'pommel-strike';
+export type WeaponStyle = 'longsword' | 'warhammer' | 'twin-axes' | 'pommel-strike' | 'master-sword';
 export type ImpactStyle = 'slash' | 'x-slash' | 'bonk' | ShieldStyle;
 
 export interface ImpactEffect {
