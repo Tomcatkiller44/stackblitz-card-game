@@ -52,6 +52,7 @@ export interface GameState {
   discard: CardInstance[];
   playerHP: number;
   playerBlock: number;
+  playerThorns: number;
   energy: number;
   enemyHP: number;
   enemyBlock: number;
@@ -79,7 +80,7 @@ function isGameState(value: unknown): value is GameState {
   if (!value || typeof value !== 'object') return false;
   const state = value as Partial<GameState>;
   const numericFields: (keyof GameState)[] = [
-    'playerHP', 'playerBlock', 'energy', 'enemyHP', 'enemyBlock',
+    'playerHP', 'playerBlock', 'playerThorns', 'energy', 'enemyHP', 'enemyBlock',
     'enemyVulnerable', 'intentIndex', 'turn', 'enemyIndex', 'damageDealt', 'damageTaken',
   ];
 
@@ -101,6 +102,7 @@ function createInitialState(): GameState {
     deck, hand, discard,
     playerHP: PLAYER_MAX_HP,
     playerBlock: 0,
+    playerThorns: 0,
     energy: PLAYER_MAX_ENERGY,
     enemyHP: ENEMIES[0].maxHP,
     enemyBlock: 0,
@@ -153,6 +155,7 @@ export function playCard(uid: string) {
     let enemyVulnerable = prev.enemyVulnerable;
     let playerHP = prev.playerHP;
     let playerBlock = prev.playerBlock;
+    let playerThorns = prev.playerThorns;
     let deck = prev.deck;
     let damageDealt = prev.damageDealt;
     const enemy = ENEMIES[prev.enemyIndex];
@@ -185,6 +188,11 @@ export function playCard(uid: string) {
       log.unshift(`${enemy.name} is Vulnerable!`);
     }
 
+    if (card.thorns) {
+      playerThorns += card.thorns;
+      log.unshift(`Thorns ${card.thorns} until your next turn.`);
+    }
+
     if (card.heal) {
       playerHP = Math.min(PLAYER_MAX_HP, playerHP + card.heal);
       log.unshift(`You heal ${card.heal} HP.`);
@@ -205,7 +213,7 @@ export function playCard(uid: string) {
       log.unshift(`${enemy.name} is defeated!`);
     }
 
-    return { ...prev, deck, hand, discard, playerHP, playerBlock, enemyHP, enemyBlock, enemyVulnerable, damageDealt, energy: newEnergy, phase, log: log.slice(0, 6) };
+    return { ...prev, deck, hand, discard, playerHP, playerBlock, playerThorns, enemyHP, enemyBlock, enemyVulnerable, damageDealt, energy: newEnergy, phase, log: log.slice(0, 6) };
   });
 }
 
@@ -226,6 +234,7 @@ export function advanceToNextFoe() {
       discard,
       playerHP,
       playerBlock: 0,
+      playerThorns: 0,
       energy: PLAYER_MAX_ENERGY,
       enemyHP: next.maxHP,
       enemyBlock: 0,
@@ -261,7 +270,9 @@ function scheduleEnemyTurn(intentIndex: number) {
       let playerHP = prev.playerHP;
       let playerBlock = prev.playerBlock;
       let enemyBlock = prev.enemyBlock;
+      let enemyHP = prev.enemyHP;
       let damageTaken = prev.damageTaken;
+      let damageDealt = prev.damageDealt;
       const log = [...prev.log];
 
       if (intent.type === 'attack') {
@@ -277,6 +288,18 @@ function scheduleEnemyTurn(intentIndex: number) {
           log.unshift(`${enemy.name} uses ${intent.label}! Blocked.`);
         }
         addFloat('player', hpLoss > 0 ? `-${hpLoss}` : 'Blocked', hpLoss > 0 ? 'damage' : 'block');
+
+        if (prev.playerThorns > 0) {
+          const thornAbsorbed = Math.min(enemyBlock, prev.playerThorns);
+          enemyBlock -= thornAbsorbed;
+          const thornDmg = Math.min(enemyHP, prev.playerThorns - thornAbsorbed);
+          if (thornDmg > 0) {
+            enemyHP -= thornDmg;
+            damageDealt += thornDmg;
+            log.unshift(`Thorns hit ${enemy.name} for ${thornDmg}!`);
+            addFloat('enemy', `-${thornDmg}`, 'damage');
+          }
+        }
       } else if (intent.type === 'defend') {
         enemyBlock += intent.value;
         log.unshift(`${enemy.name} gains ${intent.value} Block with ${intent.label}.`);
@@ -288,11 +311,15 @@ function scheduleEnemyTurn(intentIndex: number) {
       if (playerHP <= 0) {
         phase = 'lost';
         log.unshift('You have been defeated!');
+      } else if (enemyHP <= 0) {
+        phase = prev.enemyIndex === ENEMIES.length - 1 ? 'won' : 'cleared';
+        log.unshift(`${enemy.name} is defeated!`);
       }
 
       let turn = prev.turn;
       let energy = prev.energy;
       let enemyVulnerable = prev.enemyVulnerable;
+      let playerThorns = prev.playerThorns;
       let deck = prev.deck;
       let discard = prev.discard;
       let hand: CardInstance[] = [];
@@ -301,6 +328,7 @@ function scheduleEnemyTurn(intentIndex: number) {
         turn += 1;
         energy = PLAYER_MAX_ENERGY;
         playerBlock = 0;
+        playerThorns = 0;
         enemyBlock = 0;
         enemyVulnerable = Math.max(0, enemyVulnerable - 1);
         const result = drawCards(deck, discard, HAND_SIZE);
@@ -310,7 +338,7 @@ function scheduleEnemyTurn(intentIndex: number) {
         log.unshift(`--- Turn ${turn} ---`);
       }
 
-      return { ...prev, deck, hand, discard, playerHP, playerBlock, enemyBlock, enemyVulnerable, energy, damageTaken, intentIndex: nextIntentIndex, phase, turn, log: log.slice(0, 6) };
+      return { ...prev, deck, hand, discard, playerHP, playerBlock, playerThorns, enemyHP, enemyBlock, enemyVulnerable, energy, damageDealt, damageTaken, intentIndex: nextIntentIndex, phase, turn, log: log.slice(0, 6) };
     });
   }, 900);
 }

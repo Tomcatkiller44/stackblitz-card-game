@@ -48,12 +48,32 @@ export const CARDS: CardDef[] = [
     damage: 7,
     drawCards: 1,
   },
+  {
+    id: 'bulwark',
+    name: 'Bulwark',
+    cost: 2,
+    type: 'skill',
+    rarity: 'uncommon',
+    description: 'Gain 12 Block.',
+    block: 12,
+  },
+  {
+    id: 'thornmail',
+    name: 'Thornmail',
+    cost: 1,
+    type: 'skill',
+    rarity: 'uncommon',
+    description: 'Gain 4 Block.\nWhen attacked, deal 2 damage back.',
+    block: 4,
+    thorns: 2,
+  },
 ];
 
 export const STARTER_DECK: string[] = [
   'strike', 'strike', 'strike', 'strike',
   'defend', 'defend', 'defend',
   'bash', 'cleave', 'pommel',
+  'bulwark', 'thornmail',
 ];
 
 export const ENEMIES: EnemyDef[] = [

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Heart, Zap, Flame, Shield, Swords, RotateCcw } from 'lucide-svelte';
+  import { Heart, Zap, Flame, Shield, Swords, RotateCcw, Sparkles } from 'lucide-svelte';
   import { game, floats, enemyIntent, playCard, endTurn, restart, advanceToNextFoe } from './gameStore';
   import { ENEMIES, PLAYER_MAX_HP, PLAYER_MAX_ENERGY } from './gameData';
   import Card from './Card.svelte';
@@ -113,6 +113,13 @@
           <div class="absolute -top-2 -left-2 flex items-center gap-1 px-1.5 py-0.5 bg-sky-950 border border-sky-600 rounded-full">
             <Shield size={10} class="text-sky-400" />
             <span class="text-[10px] font-bold text-sky-300">{state.playerBlock}</span>
+          </div>
+        {/if}
+
+        {#if state.playerThorns > 0}
+          <div class="absolute -top-2 -right-2 flex items-center gap-1 px-1.5 py-0.5 bg-rose-950 border border-rose-600 rounded-full">
+            <Sparkles size={10} class="text-rose-400" />
+            <span class="text-[10px] font-bold text-rose-300">{state.playerThorns}</span>
           </div>
         {/if}
 

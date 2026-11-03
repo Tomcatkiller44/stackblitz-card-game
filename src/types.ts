@@ -13,6 +13,7 @@ export interface CardDef {
   vulnerable?: number;
   drawCards?: number;
   heal?: number;
+  thorns?: number;
 }
 
 export interface CardInstance extends CardDef {
