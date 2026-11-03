@@ -1,10 +1,11 @@
 <script lang="ts">
   import { Heart, Zap, Flame, Shield, Swords, RotateCcw, Sparkles } from 'lucide-svelte';
-  import { game, floats, enemyIntent, playCard, endTurn, restart, advanceToNextFoe } from './gameStore';
+  import { game, floats, impactEffects, enemyIntent, playCard, endTurn, restart, advanceToNextFoe } from './gameStore';
   import { ENEMIES, PLAYER_MAX_HP, PLAYER_MAX_ENERGY } from './gameData';
   import Card from './Card.svelte';
   import HealthBar from './HealthBar.svelte';
   import EnemyPortrait from './EnemyPortrait.svelte';
+  import AttackImpact from './AttackImpact.svelte';
   import BattleResultOverlay from './BattleResultOverlay.svelte';
 
   $: state = $game;
@@ -72,6 +73,10 @@
               <span class="text-[10px] font-bold text-sky-300">{state.enemyBlock}</span>
             </div>
           {/if}
+
+          {#each $impactEffects as effect (effect.id)}
+            <AttackImpact style={effect.style} />
+          {/each}
 
           {#each enemyFloats as f (f.id)}
             <div class="absolute top-8 left-1/2 -translate-x-1/2 text-2xl font-bold animate-float-up {floatColor(f.kind)}">

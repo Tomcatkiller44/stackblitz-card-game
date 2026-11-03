@@ -9,6 +9,7 @@ export const CARDS: CardDef[] = [
     rarity: 'common',
     description: 'Deal 6 damage.',
     damage: 6,
+    impact: 'slash',
   },
   {
     id: 'defend',
@@ -28,6 +29,7 @@ export const CARDS: CardDef[] = [
     description: 'Deal 8 damage.\nApply 2 Vulnerable.',
     damage: 8,
     vulnerable: 2,
+    impact: 'slash',
   },
   {
     id: 'cleave',
@@ -37,6 +39,7 @@ export const CARDS: CardDef[] = [
     rarity: 'common',
     description: 'Deal 9 damage.',
     damage: 9,
+    impact: 'x-slash',
   },
   {
     id: 'pommel',
@@ -47,6 +50,7 @@ export const CARDS: CardDef[] = [
     description: 'Deal 7 damage.\nDraw 1 card.',
     damage: 7,
     drawCards: 1,
+    impact: 'bonk',
   },
   {
     id: 'bulwark',

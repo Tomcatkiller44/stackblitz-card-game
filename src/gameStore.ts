@@ -1,5 +1,5 @@
 import { writable, derived, get } from 'svelte/store';
-import type { CardInstance, GamePhase, FloatingNumber } from './types';
+import type { CardInstance, GamePhase, FloatingNumber, ImpactEffect, ImpactStyle } from './types';
 import { CARDS, ENEMIES, STARTER_DECK, PLAYER_MAX_HP, PLAYER_MAX_ENERGY, HAND_SIZE, RECOVERY_BETWEEN_FOES } from './gameData';
 import { persistentWritable } from './persistentStore';
 
@@ -123,6 +123,7 @@ export const game = persistentWritable<GameState>(
   isGameState
 );
 export const floats = writable<FloatingNumber[]>([]);
+export const impactEffects = writable<ImpactEffect[]>([]);
 
 export const enemyIntent = derived(game, ($g) => {
   const intents = ENEMIES[$g.enemyIndex].intents;
@@ -130,6 +131,16 @@ export const enemyIntent = derived(game, ($g) => {
 });
 
 let pendingEnemyTurn: ReturnType<typeof setTimeout> | undefined;
+
+let impactId = 0;
+
+function showImpact(style: ImpactStyle) {
+  const id = ++impactId;
+  impactEffects.update((prev) => [...prev, { id, style }]);
+  setTimeout(() => {
+    impactEffects.update((prev) => prev.filter((e) => e.id !== id));
+  }, 700);
+}
 
 export function addFloat(target: 'player' | 'enemy', text: string, kind: 'damage' | 'block' | 'heal') {
   const id = ++floatId;
@@ -162,6 +173,7 @@ export function playCard(uid: string) {
     const log = [...prev.log];
 
     if (card.damage) {
+      if (card.impact) showImpact(card.impact);
       let dmg = card.damage;
       if (enemyVulnerable > 0) dmg = Math.floor(dmg * 1.5);
       const absorbed = Math.min(enemyBlock, dmg);
