@@ -17,6 +17,21 @@ function withBanishingSpawn(hand: CardInstance[]): CardInstance[] {
   return Math.random() < BANISHING_SPAWN_CHANCE ? [...hand, createCardInstance('banishing-strike')] : hand;
 }
 
+const DOUBLE_EFFECT_AFTER_USES = 5;
+
+function doubledEffects(card: CardInstance): CardInstance {
+  const scale = (n?: number) => (n ? n * 2 : n);
+  return {
+    ...card,
+    damage: scale(card.damage),
+    block: scale(card.block),
+    vulnerable: scale(card.vulnerable),
+    thorns: scale(card.thorns),
+    heal: scale(card.heal),
+    drawCards: scale(card.drawCards),
+  };
+}
+
 function buildDeck(): CardInstance[] {
   return STARTER_DECK.map(createCardInstance);
 }
@@ -56,6 +71,7 @@ export interface GameState {
   deck: CardInstance[];
   hand: CardInstance[];
   discard: CardInstance[];
+  playCounts: Record<string, number>;
   playerHP: number;
   playerBlock: number;
   playerThorns: number;
@@ -94,6 +110,7 @@ function isGameState(value: unknown): value is GameState {
     Array.isArray(state.deck) && state.deck.every(isCardInstance) &&
     Array.isArray(state.hand) && state.hand.every(isCardInstance) &&
     Array.isArray(state.discard) && state.discard.every(isCardInstance) &&
+    typeof state.playCounts === 'object' && state.playCounts !== null &&
     numericFields.every((field) => typeof state[field] === 'number' && Number.isFinite(state[field])) &&
     state.enemyIndex! >= 0 && state.enemyIndex! < ENEMIES.length &&
     isGamePhase(state.phase) &&
@@ -108,6 +125,7 @@ function createInitialState(): GameState {
     deck: drawn.deck,
     hand: withBanishingSpawn(drawn.hand),
     discard: drawn.discard,
+    playCounts: {},
     playerHP: PLAYER_MAX_HP,
     playerBlock: 0,
     playerThorns: 0,
@@ -161,12 +179,16 @@ export function addFloat(target: 'player' | 'enemy', text: string, kind: 'damage
 export function playCard(uid: string) {
   game.update((prev) => {
     if (prev.phase !== 'player') return prev;
-    const card = prev.hand.find((c) => c.uid === uid);
-    if (!card || card.cost > prev.energy) return prev;
+    const base = prev.hand.find((c) => c.uid === uid);
+    if (!base || base.cost > prev.energy) return prev;
 
-    const newEnergy = prev.energy - card.cost;
+    const timesUsed = prev.playCounts[base.id] ?? 0;
+    const card = timesUsed >= DOUBLE_EFFECT_AFTER_USES ? doubledEffects(base) : base;
+    const playCounts = { ...prev.playCounts, [base.id]: timesUsed + 1 };
+
+    const newEnergy = prev.energy - base.cost;
     const newHand = prev.hand.filter((c) => c.uid !== uid);
-    let discard = [...prev.discard, card];
+    let discard = [...prev.discard, base];
     let hand = newHand;
 
     let enemyHP = prev.enemyHP;
@@ -234,11 +256,11 @@ export function playCard(uid: string) {
       log.unshift(`${enemy.name} is defeated!`);
       if (card.returnsOnKill) {
         discard = discard.filter((c) => c.uid !== card.uid);
-        deck = [card, ...deck];
+        deck = [base, ...deck];
       }
     }
 
-    return { ...prev, deck, hand, discard, playerHP, playerBlock, playerThorns, enemyHP, enemyBlock, enemyVulnerable, damageDealt, energy: newEnergy, phase, log: log.slice(0, 6) };
+    return { ...prev, deck, hand, discard, playerHP, playerBlock, playerThorns, enemyHP, enemyBlock, enemyVulnerable, damageDealt, energy: newEnergy, phase, log: log.slice(0, 6), playCounts };
   });
 }
 
