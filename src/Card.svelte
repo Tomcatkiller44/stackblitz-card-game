@@ -71,7 +71,7 @@
     <!-- Art area -->
     <div class="absolute top-0 left-0 right-0 h-24 flex items-center justify-center">
       {#if card.art}
-        <ShieldArt art={card.art} className="w-20 h-20 drop-shadow-lg" />
+        <ShieldArt art={card.art} className="w-16 h-16 drop-shadow-lg" />
       {:else}
         <Sword size={48} class="text-red-500/30" />
       {/if}
@@ -80,13 +80,9 @@
     <!-- Divider -->
     <div class="absolute top-24 left-2 right-2 border-t border-slate-600/50"></div>
 
-    <!-- Name -->
-    <div class="absolute top-26 left-0 right-0 px-2 pt-1">
+    <!-- Name and effect text -->
+    <div class="absolute top-24 bottom-1 left-0 right-0 flex flex-col items-center justify-center gap-1.5 px-3">
       <h3 class="text-center text-xs font-bold text-slate-100 leading-tight">{card.name}</h3>
-    </div>
-
-    <!-- Description -->
-    <div class="absolute bottom-2 left-2 right-2">
       <p class="text-center text-[10px] text-slate-300 leading-snug whitespace-pre-line">{card.description}</p>
     </div>
 
