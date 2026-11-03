@@ -13,6 +13,10 @@ function createCardInstance(id: string): CardInstance {
   return { ...def, uid: nextUid() };
 }
 
+function withBanishingSpawn(hand: CardInstance[]): CardInstance[] {
+  return Math.random() < BANISHING_SPAWN_CHANCE ? [...hand, createCardInstance('banishing-strike')] : hand;
+}
+
 function buildDeck(): CardInstance[] {
   return STARTER_DECK.map(createCardInstance);
 }
@@ -99,9 +103,11 @@ function isGameState(value: unknown): value is GameState {
 
 function createInitialState(): GameState {
   const full = shuffle(buildDeck());
-  const { hand, deck, discard } = drawCards(full, [], HAND_SIZE);
+  const drawn = drawCards(full, [], HAND_SIZE);
   return {
-    deck, hand, discard,
+    deck: drawn.deck,
+    hand: withBanishingSpawn(drawn.hand),
+    discard: drawn.discard,
     playerHP: PLAYER_MAX_HP,
     playerBlock: 0,
     playerThorns: 0,
@@ -242,12 +248,12 @@ export function advanceToNextFoe() {
 
     const nextIndex = prev.enemyIndex + 1;
     const next = ENEMIES[nextIndex];
-    const spawned = Math.random() < BANISHING_SPAWN_CHANCE ? [createCardInstance('banishing-strike')] : [];
-    const recycled = [...prev.discard, ...prev.hand, ...spawned];
-    const { hand, deck, discard } = drawCards(prev.deck, recycled, HAND_SIZE);
+    const recycled = [...prev.discard, ...prev.hand];
+    const drawn = drawCards(prev.deck, recycled, HAND_SIZE);
+    const hand = withBanishingSpawn(drawn.hand);
+    const deck = drawn.deck;
+    const discard = drawn.discard;
     const playerHP = Math.min(PLAYER_MAX_HP, prev.playerHP + RECOVERY_BETWEEN_FOES);
-    const header = `--- Turn ${prev.turn + 1}: ${next.name} appears! ---`;
-    const found = spawned.length > 0 ? ['A Banishing Strike joins your deck!'] : [];
 
     return {
       ...prev,
@@ -265,7 +271,7 @@ export function advanceToNextFoe() {
       intentIndex: 0,
       phase: 'player',
       turn: prev.turn + 1,
-      log: [header, ...found, ...prev.log].slice(0, 6),
+      log: [`--- Turn ${prev.turn + 1}: ${next.name} appears! ---`, ...prev.log].slice(0, 6),
     };
   });
 }
@@ -354,7 +360,7 @@ function scheduleEnemyTurn(intentIndex: number) {
         enemyBlock = 0;
         enemyVulnerable = Math.max(0, enemyVulnerable - 1);
         const result = drawCards(deck, discard, HAND_SIZE);
-        hand = result.hand;
+        hand = withBanishingSpawn(result.hand);
         deck = result.deck;
         discard = result.discard;
         log.unshift(`--- Turn ${turn} ---`);
