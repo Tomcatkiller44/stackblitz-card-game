@@ -7,14 +7,22 @@
 
 <svg viewBox="0 0 100 100" class={className} aria-hidden="true">
   {#if weapon === 'longsword'}
-    <polygon points="84,6 90,12 52,56 40,60 44,48" fill="#e2e8f0" stroke="#64748b" stroke-width="1.5" stroke-linejoin="round" />
-    <line x1="29" y1="47" x2="45" y2="63" stroke="#fbbf24" stroke-width="6" stroke-linecap="round" />
-    <line x1="37" y1="55" x2="18" y2="74" stroke="#92400e" stroke-width="6" stroke-linecap="round" />
-    <circle cx="14" cy="78" r="5" fill="#fbbf24" stroke="#b45309" stroke-width="1.5" />
+    <g transform="rotate(45 50 50)">
+      <path d="M50 3 L57 16 L57 60 L43 60 L43 16 Z" fill="#e2e8f0" stroke="#64748b" stroke-width="1.5" stroke-linejoin="round" />
+      <line x1="50" y1="14" x2="50" y2="56" stroke="#94a3b8" stroke-width="1.5" />
+      <rect x="28" y="60" width="44" height="6" rx="3" fill="#fbbf24" stroke="#b45309" stroke-width="1.5" />
+      <rect x="46" y="66" width="8" height="20" rx="2" fill="#7c2d12" />
+      <circle cx="50" cy="91" r="5.5" fill="#fbbf24" stroke="#b45309" stroke-width="1.5" />
+    </g>
   {:else if weapon === 'warhammer'}
-    <line x1="22" y1="88" x2="60" y2="46" stroke="#92400e" stroke-width="7" stroke-linecap="round" />
-    <rect x="47" y="33" width="30" height="18" rx="2" fill="#64748b" stroke="#cbd5e1" stroke-width="2" transform="rotate(45 62 42)" />
-    <rect x="58" y="22" width="12" height="40" rx="2" fill="#475569" stroke="#cbd5e1" stroke-width="2" transform="rotate(45 62 42)" />
+    <rect x="45" y="34" width="10" height="58" rx="4" fill="#92400e" />
+    <rect x="22" y="12" width="56" height="28" rx="4" fill="#64748b" stroke="#cbd5e1" stroke-width="2" />
+    <rect x="22" y="12" width="12" height="28" rx="3" fill="#334155" />
+    <line x1="36" y1="12" x2="36" y2="40" stroke="#cbd5e1" stroke-width="1.5" />
+    <line x1="14" y1="16" x2="6" y2="10" stroke="#fcd34d" stroke-width="3" stroke-linecap="round" />
+    <line x1="86" y1="16" x2="94" y2="10" stroke="#fcd34d" stroke-width="3" stroke-linecap="round" />
+    <line x1="14" y1="30" x2="4" y2="30" stroke="#fcd34d" stroke-width="3" stroke-linecap="round" />
+    <line x1="86" y1="30" x2="96" y2="30" stroke="#fcd34d" stroke-width="3" stroke-linecap="round" />
   {:else if weapon === 'twin-axes'}
     <line x1="20" y1="80" x2="72" y2="28" stroke="#92400e" stroke-width="6" stroke-linecap="round" />
     <line x1="80" y1="80" x2="28" y2="28" stroke="#92400e" stroke-width="6" stroke-linecap="round" />
