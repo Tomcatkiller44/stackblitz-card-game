@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { ImpactStyle } from './types';
-  import CardArt from './CardArt.svelte';
+  import ShieldArt from './ShieldArt.svelte';
 
   export let style: ImpactStyle;
 
@@ -36,7 +36,7 @@
     </svg>
   {:else}
     <div class="shield-pop">
-      <CardArt art={style} className="w-24 h-24 drop-shadow-xl" />
+      <ShieldArt art={style} className="w-24 h-24 drop-shadow-xl" />
     </div>
   {/if}
 </div>

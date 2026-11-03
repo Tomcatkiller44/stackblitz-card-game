@@ -15,7 +15,7 @@ export interface CardDef {
   heal?: number;
   thorns?: number;
   impact: ImpactStyle;
-  art: CardArtKind;
+  art?: ShieldStyle;
 }
 
 export interface CardInstance extends CardDef {
@@ -40,7 +40,6 @@ export type GameScreen = 'start' | 'battle';
 
 export type ShieldStyle = 'shield' | 'shield-reinforced' | 'shield-spiky';
 export type ImpactStyle = 'slash' | 'x-slash' | 'bonk' | ShieldStyle;
-export type CardArtKind = 'sword' | 'sword-reinforced' | 'sword-reversed' | ShieldStyle;
 
 export interface ImpactEffect {
   id: number;
