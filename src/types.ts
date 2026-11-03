@@ -20,6 +20,7 @@ export interface CardInstance extends CardDef {
 }
 
 export interface EnemyDef {
+  id: string;
   name: string;
   maxHP: number;
   intents: EnemyIntent[];
@@ -31,7 +32,7 @@ export interface EnemyIntent {
   label: string;
 }
 
-export type GamePhase = 'player' | 'enemy' | 'won' | 'lost';
+export type GamePhase = 'player' | 'enemy' | 'cleared' | 'won' | 'lost';
 export type GameScreen = 'start' | 'battle';
 
 export interface FloatingNumber {

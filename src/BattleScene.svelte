@@ -1,12 +1,16 @@
 <script lang="ts">
   import { Heart, Zap, Flame, Shield, Swords, RotateCcw } from 'lucide-svelte';
-  import { game, floats, enemyIntent, playCard, endTurn, restart } from './gameStore';
-  import { ENEMY, PLAYER_MAX_HP, PLAYER_MAX_ENERGY } from './gameData';
+  import { game, floats, enemyIntent, playCard, endTurn, restart, advanceToNextFoe } from './gameStore';
+  import { ENEMIES, PLAYER_MAX_HP, PLAYER_MAX_ENERGY } from './gameData';
   import Card from './Card.svelte';
   import HealthBar from './HealthBar.svelte';
+  import EnemyPortrait from './EnemyPortrait.svelte';
+  import BattleResultOverlay from './BattleResultOverlay.svelte';
 
   $: state = $game;
   $: intent = $enemyIntent;
+  $: enemy = ENEMIES[state.enemyIndex];
+  $: nextEnemy = ENEMIES[state.enemyIndex + 1];
   $: enemyFloats = $floats.filter((f) => f.target === 'enemy');
   $: playerFloats = $floats.filter((f) => f.target === 'player');
 
@@ -24,7 +28,7 @@
       <Swords size={22} class="text-amber-400" />
       <span class="text-lg font-bold tracking-wide">Spire Clash</span>
     </div>
-    <div class="text-sm text-slate-400">Turn {state.turn}</div>
+    <div class="text-sm text-slate-400">Foe {state.enemyIndex + 1} of {ENEMIES.length} &middot; Turn {state.turn}</div>
   </div>
 
   <!-- Battle area -->
@@ -52,15 +56,7 @@
           <div
             class="w-32 h-32 rounded-2xl border-2 bg-gradient-to-b from-emerald-900/40 to-slate-900 flex items-center justify-center transition-all duration-300 {state.enemyVulnerable > 0 ? 'border-red-500 animate-pulse' : 'border-slate-700'} {state.phase === 'enemy' ? 'scale-105' : ''}"
           >
-            <svg viewBox="0 0 100 100" class="w-24 h-24">
-              <ellipse cx="50" cy="70" rx="38" ry="25" fill="#10b981" opacity="0.8" />
-              <ellipse cx="50" cy="60" rx="35" ry="30" fill="#34d399" opacity="0.7" />
-              <circle cx="38" cy="55" r="5" fill="#1e293b" />
-              <circle cx="62" cy="55" r="5" fill="#1e293b" />
-              <circle cx="39" cy="54" r="2" fill="white" />
-              <circle cx="63" cy="54" r="2" fill="white" />
-              <path d="M 38 68 Q 50 75 62 68" stroke="#1e293b" stroke-width="2" fill="none" />
-            </svg>
+            <EnemyPortrait id={enemy.id} />
           </div>
 
           {#if state.enemyVulnerable > 0}
@@ -86,8 +82,8 @@
       </div>
 
       <div class="w-64">
-        <p class="text-center text-sm font-semibold mb-1">{ENEMY.name}</p>
-        <HealthBar current={state.enemyHP} max={ENEMY.maxHP} block={state.enemyBlock} />
+        <p class="text-center text-sm font-semibold mb-1">{enemy.name}</p>
+        <HealthBar current={state.enemyHP} max={enemy.maxHP} block={state.enemyBlock} />
       </div>
     </div>
 
@@ -205,26 +201,18 @@
     </div>
   </div>
 
-  <!-- Victory / Defeat overlay -->
-  {#if state.phase === 'won' || state.phase === 'lost'}
-    <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 animate-fade-in">
-      <div class="text-center">
-        <h2 class="text-5xl font-bold mb-4 {state.phase === 'won' ? 'text-amber-400' : 'text-red-500'}">
-          {state.phase === 'won' ? 'VICTORY' : 'DEFEATED'}
-        </h2>
-        <p class="text-slate-400 mb-6">
-          {state.phase === 'won'
-            ? `You slew the ${ENEMY.name} in ${state.turn} turns!`
-            : `The ${ENEMY.name} has bested you.`}
-        </p>
-        <button
-          on:click={restart}
-          class="flex items-center gap-2 px-6 py-3 bg-amber-600 hover:bg-amber-500 text-white font-semibold rounded-lg transition-colors shadow-xl mx-auto"
-        >
-          <RotateCcw size={18} />
-          Rematch
-        </button>
-      </div>
-    </div>
+  {#if state.phase === 'cleared' || state.phase === 'won' || state.phase === 'lost'}
+    <BattleResultOverlay
+      phase={state.phase}
+      foeName={enemy.name}
+      nextFoeName={nextEnemy?.name}
+      foeNumber={state.enemyIndex + 1}
+      totalFoes={ENEMIES.length}
+      turn={state.turn}
+      damageDealt={state.damageDealt}
+      damageTaken={state.damageTaken}
+      onContinue={advanceToNextFoe}
+      onRestart={restart}
+    />
   {/if}
 </div>

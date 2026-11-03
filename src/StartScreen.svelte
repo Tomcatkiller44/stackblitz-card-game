@@ -17,7 +17,7 @@
       Spire Clash
     </h1>
     <p class="text-slate-400 mb-10 text-lg">
-      A roguelike card battle. Strategize your turns, manage your energy, and slay the Slime.
+      A roguelike card battle. Strategize your turns, manage your energy, and conquer five foes, from the humble Slime to the mighty Dragon.
     </p>
 
     <div class="grid grid-cols-3 gap-4 mb-10">

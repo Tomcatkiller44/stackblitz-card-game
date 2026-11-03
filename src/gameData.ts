@@ -56,18 +56,63 @@ export const STARTER_DECK: string[] = [
   'bash', 'cleave', 'pommel',
 ];
 
-export const ENEMY: EnemyDef = {
-  name: 'Slime',
-  maxHP: 45,
-  intents: [
-    { type: 'attack', value: 11, label: 'Tackle' },
-    { type: 'defend', value: 6, label: 'Harden' },
-    { type: 'attack', value: 16, label: 'Crush' },
-    { type: 'attack', value: 11, label: 'Tackle' },
-    { type: 'defend', value: 6, label: 'Harden' },
-  ],
-};
+export const ENEMIES: EnemyDef[] = [
+  {
+    id: 'slime',
+    name: 'Slime',
+    maxHP: 45,
+    intents: [
+      { type: 'attack', value: 11, label: 'Tackle' },
+      { type: 'defend', value: 6, label: 'Harden' },
+      { type: 'attack', value: 16, label: 'Crush' },
+      { type: 'attack', value: 11, label: 'Tackle' },
+      { type: 'defend', value: 6, label: 'Harden' },
+    ],
+  },
+  {
+    id: 'zombie',
+    name: 'Zombie',
+    maxHP: 55,
+    intents: [
+      { type: 'attack', value: 12, label: 'Claw' },
+      { type: 'defend', value: 8, label: 'Rotten Guard' },
+      { type: 'attack', value: 15, label: 'Bite' },
+    ],
+  },
+  {
+    id: 'skeleton',
+    name: 'Skeleton',
+    maxHP: 70,
+    intents: [
+      { type: 'attack', value: 14, label: 'Slash' },
+      { type: 'defend', value: 10, label: 'Bone Shield' },
+      { type: 'attack', value: 18, label: 'Skewer' },
+    ],
+  },
+  {
+    id: 'demon',
+    name: 'Demon',
+    maxHP: 90,
+    intents: [
+      { type: 'attack', value: 18, label: 'Hellfire' },
+      { type: 'defend', value: 12, label: 'Infernal Ward' },
+      { type: 'attack', value: 22, label: 'Cleave' },
+    ],
+  },
+  {
+    id: 'dragon',
+    name: 'Dragon',
+    maxHP: 120,
+    intents: [
+      { type: 'attack', value: 20, label: 'Tail Sweep' },
+      { type: 'defend', value: 15, label: 'Scale Armor' },
+      { type: 'attack', value: 28, label: 'Inferno Breath' },
+      { type: 'attack', value: 24, label: 'Claw Rend' },
+    ],
+  },
+];
 
 export const PLAYER_MAX_HP = 72;
 export const PLAYER_MAX_ENERGY = 3;
 export const HAND_SIZE = 5;
+export const RECOVERY_BETWEEN_FOES = 20;
